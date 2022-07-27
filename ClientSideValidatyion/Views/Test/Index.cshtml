@@ -1,0 +1,104 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<style >
+    .error{
+        color:red;
+    }
+</style>
+
+<div class="container-fluid">
+    <form id="myForm">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="txtName" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="text" name="txtAge" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="txtPhone" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" name="txtEmail" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" name="txtpwd" class="form-control" />
+                </div>
+
+            </div>
+            <div class="col-sm-12">
+                <button class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $.validator.addMethod('mypassword', function (value, element) {
+            return this.optional(element) || (value.match('/[a-zA-Z]/') && value.match('/[0-9]/'));
+        }, 'Password must be conatin atleast one numeric and alphabetic chars');
+
+        $('#myForm').validate({
+            rules: {
+                txtName: "required",
+                txtAge: {
+                    required: true,
+                    range:[18,25]
+                },
+                txtPhone: {
+                    required: true,
+                    minlength: 11,
+                    maxlengtg:11
+                },
+                txtEmail: {
+                    required: true,
+                    emai: true
+                },
+                txtpwd: {
+                    required: true,
+                    minlength: 8,
+                    mypassword: true
+                },
+            },
+
+            messages: {
+                txtName: "Name is Required",
+                txtAge: {
+                    required: "Age is Required",
+                    range: "Age should between 18 to 25",
+                },
+                txtPhone: {
+                    required: "Phone is Required",
+                    minlength: "Provied Valid Phone Number",
+                    maxlengtg: "Provied Valid Phone Number",
+                },
+                txtEmail: {
+                    required:"Email is Required",
+                    emai: "Email is Invalid",
+                },
+                txtpwd: {
+                    required:"Password is Required",
+                    minlength: "Password must coonatain 8 char",
+                   
+                },
+            },
+
+            submitHandler: function () {
+                alert('Form Submit Successfully!');
+            }
+        });
+    });
+        
+   
+</script>
