@@ -1,0 +1,562 @@
+﻿
+==========Table Create========
+
+Create table Student(          
+    Id int IDENTITY(1,1) NOT NULL,          
+    FirstName varchar(50) NOT NULL,          
+    LastName varchar(50) NOT NULL,  
+    Email varchar(30) NOT NULL,   
+    Mobile varchar(20) NOT NULL,  
+    Address varchar(220)  NULL,         
+)  
+
+================Insert a Student Record============
+
+Create procedure spAddStudent          
+(          
+    @FirstName VARCHAR(50),           
+    @LastName VARCHAR(50),          
+    @Email VARCHAR(30),          
+    @Mobile VARCHAR(20),  
+    @Address VARCHAR(220)          
+)          
+as           
+Begin           
+    Insert into Student (FirstName,LastName,Email, Mobile,Address)           
+    Values (@FirstName,@LastName,@Email, @Mobile,@Address)           
+End  
+
+===================Update a Student Record================
+
+
+Create procedure spUpdateStudent            
+(            
+    @Id INTEGER ,          
+    @FirstName VARCHAR(50),           
+    @LastName VARCHAR(50),          
+    @Email VARCHAR(30),          
+    @Mobile VARCHAR(20),  
+    @Address VARCHAR(220)            
+)            
+as            
+begin            
+   Update Student             
+   set FirstName=@FirstName,            
+   LastName=@LastName,            
+   Email=@Email,          
+   Mobile=@Mobile,   
+   Address=@Address            
+   where Id=@Id            
+End
+
+=====================Delete a Student Record===========
+
+Create procedure spDeleteStudent           
+(            
+   @Id int            
+)            
+as             
+begin            
+   Delete from Student where Id=@Id            
+End
+
+
+====================View all Student Records===========
+
+
+Create procedure spGetAllStudent        
+as        
+Begin        
+    select *        
+    from Student     
+    order by Id   
+End  
+
+
+==================ConnectionString Calss============
+
+public static class ConnectionString  
+{  
+   private static string cName = "Data Source=.; Initial Catalog=StudentManagement;User ID=sa;Password=123";  
+   public static string CName { get => cName;}  
+}
+
+====================== we will create a class named “Student” within model folder.============
+
+public class Student  
+    {  
+        public int Id { set; get; }  
+        [Required]  
+        public string FirstName { set; get; }  
+        [Required]  
+        public string LastName { set; get; }  
+        [Required]  
+        public string Email { set; get; }  
+        [Required]  
+        public string Mobile { set; get; }  
+        public string Address { set; get; }  
+    } 
+
+====================== we will create  StudentController============
+
+
+public class StudentController : Controller  
+    {  
+        
+        
+        StudentDataAccessLayer studentDataAccessLayer = null;  
+        public StudentController()  
+        {  
+           studentDataAccessLayer = new StudentDataAccessLayer();  
+        }
+
+
+        public ActionResult Index()  
+        {  IEnumerable<Student> students = studentDataAccessLayer.GetAllStudent();
+            return View(students);  
+        }  
+  
+         
+        public ActionResult Details(int id)  
+        {  
+            return View();  
+        }  
+  
+       
+        public ActionResult Create()  
+        {  
+            return View();  
+        }  
+  
+    
+        [HttpPost]  
+        [ValidateAntiForgeryToken]  
+        public ActionResult Create(IFormCollection collection)  
+        {  
+            try  
+            {  
+                // TODO: Add insert logic here  
+
+                studentDataAccessLayer.AddStudent(student);  
+  
+                return RedirectToAction(nameof(Index));  
+            }  
+            catch  
+            {  
+                return View();  
+            }  
+        }  
+  
+        
+        public ActionResult Edit(int id)  
+        {  
+             Student student = studentDataAccessLayer.GetStudentData(id);  
+             return View(student);  
+        }  
+  
+        
+        [HttpPost]  
+        [ValidateAntiForgeryToken]  
+        public ActionResult Edit(Student student)  
+        {  
+            try  
+            {  
+               // TODO: Add update logic here  
+                studentDataAccessLayer.UpdateStudent(student);  
+                return RedirectToAction(nameof(Index)); 
+  
+                return RedirectToAction(student);  
+            }  
+            catch  
+            {  
+                return View();  
+            }  
+        }  
+  
+       
+
+        public ActionResult Delete(int id)  
+        {  
+            Student student = studentDataAccessLayer.GetStudentData(id); 
+            return View();  
+        }  
+  
+        
+        [HttpPost]  
+        [ValidateAntiForgeryToken]  
+        public ActionResult Delete(int id, IFormCollection collection)  
+        {  
+            try  
+            {  
+                // TODO: Add delete logic here 
+                studentDataAccessLayer.DeleteStudent(student.Id);  
+                return RedirectToAction(nameof(Index));  
+  
+                return RedirectToAction(nameof(Index));  
+            }  
+            catch  
+            {  
+                return View();  
+            }  
+        }  
+    }  
+
+
+======================we will create a data access layer class within model folder named “StudentDataAccessLayer” ============
+
+
+
+public class StudentDataAccessLayer  
+    {          
+      string connectionString = ConnectionString.CName;    
+  
+        public IEnumerable<Student> GetAllStudent()  
+        {  
+            List<Student> lstStudent = new List<Student>();  
+            using (SqlConnection con = new SqlConnection(connectionString))  
+            {  
+                SqlCommand cmd = new SqlCommand("spGetAllStudent", con);  
+                cmd.CommandType = CommandType.StoredProcedure;  
+                con.Open();  
+                SqlDataReader rdr = cmd.ExecuteReader();  
+  
+                while (rdr.Read())  
+                {  
+                    Student student = new Student();  
+                    student.Id = Convert.ToInt32(rdr["Id"]);  
+                    student.FirstName = rdr["FirstName"].ToString();  
+                    student.LastName = rdr["LastName"].ToString();  
+                    student.Email = rdr["Email"].ToString();  
+                    student.Mobile = rdr["Mobile"].ToString();  
+                    student.Address = rdr["Address"].ToString();  
+  
+                    lstStudent.Add(student);  
+                }  
+                con.Close();  
+            }  
+            return lstStudent;  
+        }  
+        public void AddStudent(Student student)  
+        {  
+            using (SqlConnection con = new SqlConnection(connectionString))  
+            {  
+                SqlCommand cmd = new SqlCommand("spAddStudent", con);  
+                cmd.CommandType = CommandType.StoredProcedure;  
+  
+                cmd.Parameters.AddWithValue("@FirstName", student.FirstName);  
+                cmd.Parameters.AddWithValue("@LastName", student.LastName);  
+                cmd.Parameters.AddWithValue("@Email", student.Email);  
+                cmd.Parameters.AddWithValue("@Mobile", student.Mobile);  
+                cmd.Parameters.AddWithValue("@Address", student.Address);  
+                con.Open();  
+                cmd.ExecuteNonQuery();  
+                con.Close();  
+            }  
+        }  
+  
+        public void UpdateStudent(Student student)  
+        {  
+            using (SqlConnection con = new SqlConnection(connectionString))  
+            {  
+                SqlCommand cmd = new SqlCommand("spUpdateStudent", con);  
+                cmd.CommandType = CommandType.StoredProcedure;  
+  
+                cmd.Parameters.AddWithValue("@Id", student.Id);  
+                cmd.Parameters.AddWithValue("@FirstName", student.FirstName);  
+                cmd.Parameters.AddWithValue("@LastName", student.LastName);  
+                cmd.Parameters.AddWithValue("@Email", student.Email);  
+                cmd.Parameters.AddWithValue("@Mobile", student.Mobile);  
+                cmd.Parameters.AddWithValue("@Address", student.Address);  
+                con.Open();  
+                cmd.ExecuteNonQuery();  
+                con.Close();  
+            }  
+        }  
+  
+        public Student GetStudentData(int? id)  
+        {  
+            Student student = new Student();  
+  
+            using (SqlConnection con = new SqlConnection(connectionString))  
+            {  
+                string sqlQuery = "SELECT * FROM Student WHERE Id= " + id;  
+                SqlCommand cmd = new SqlCommand(sqlQuery, con);  
+                con.Open();  
+                SqlDataReader rdr = cmd.ExecuteReader();  
+  
+                while (rdr.Read())  
+                {  
+                    student.Id = Convert.ToInt32(rdr["Id"]);  
+                    student.FirstName = rdr["FirstName"].ToString();  
+                    student.LastName = rdr["LastName"].ToString();  
+                    student.Email = rdr["Email"].ToString();  
+                    student.Mobile = rdr["Mobile"].ToString();  
+                    student.Address = rdr["Address"].ToString();  
+                }  
+            }  
+            return student;  
+        }  
+  
+        public void DeleteStudent(int? id)  
+        {  
+            using (SqlConnection con = new SqlConnection(connectionString))  
+            {  
+                SqlCommand cmd = new SqlCommand("spDeleteStudent", con);  
+                cmd.CommandType = CommandType.StoredProcedure;  
+                cmd.Parameters.AddWithValue("@Id", id);  
+                con.Open();  
+                cmd.ExecuteNonQuery();  
+                con.Close();  
+            }  
+        }  
+    }  
+  
+
+====================== we will create  Create View============
+
+
+
+
+@model StudentRecordManagementSystem.Models.Student  
+@{  
+    ViewData["Title"] = "Create";  
+}  
+<h2>Create</h2>  
+  
+<h4>Student</h4>  
+<hr />  
+<div class="row">  
+    <div class="col-md-4">  
+        <form asp-action="Create">  
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>  
+            <div class="form-group">  
+                <label asp-for="Id" class="control-label"></label>  
+                <input asp-for="Id" class="form-control" />  
+                <span asp-validation-for="Id" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="FirstName" class="control-label"></label>  
+                <input asp-for="FirstName" class="form-control" />  
+                <span asp-validation-for="FirstName" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="LastName" class="control-label"></label>  
+                <input asp-for="LastName" class="form-control" />  
+                <span asp-validation-for="LastName" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="Email" class="control-label"></label>  
+                <input asp-for="Email" class="form-control" />  
+                <span asp-validation-for="Email" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="Mobile" class="control-label"></label>  
+                <input asp-for="Mobile" class="form-control" />  
+                <span asp-validation-for="Mobile" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="Address" class="control-label"></label>  
+                <input asp-for="Address" class="form-control" />  
+                <span asp-validation-for="Address" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <input type="submit" value="Create" class="btn btn-default" />  
+            </div>  
+        </form>  
+    </div>  
+</div>  
+  
+<div>  
+    <a asp-action="Index">Back to List</a>  
+</div>  
+  
+@section Scripts {  
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}  
+}  
+
+
+====================== we will create Index View============
+
+@model IEnumerable<StudentRecordManagementSystem.Models.Student>  
+@{  
+    ViewData["Title"] = "Index";  
+}  
+<h2>Index</h2>  
+  
+<p>  
+    <a asp-action="Create">Create New</a>  
+</p>  
+<table class="table">  
+    <thead>  
+        <tr>  
+            <th>  
+                @Html.DisplayNameFor(model => model.Id)  
+            </th>  
+            <th>  
+                @Html.DisplayNameFor(model => model.FirstName)  
+            </th>  
+            <th>  
+                @Html.DisplayNameFor(model => model.LastName)  
+            </th>  
+            <th>  
+                @Html.DisplayNameFor(model => model.Email)  
+            </th>  
+            <th>  
+                @Html.DisplayNameFor(model => model.Mobile)  
+            </th>  
+            <th>  
+                @Html.DisplayNameFor(model => model.Address)  
+            </th>  
+            <th></th>  
+        </tr>  
+    </thead>  
+    <tbody>  
+@foreach (var item in Model) {  
+        <tr>  
+            <td>  
+                @Html.DisplayFor(modelItem => item.Id)  
+            </td>  
+            <td>  
+                @Html.DisplayFor(modelItem => item.FirstName)  
+            </td>  
+            <td>  
+                @Html.DisplayFor(modelItem => item.LastName)  
+            </td>  
+            <td>  
+                @Html.DisplayFor(modelItem => item.Email)  
+            </td>  
+            <td>  
+                @Html.DisplayFor(modelItem => item.Mobile)  
+            </td>  
+            <td>  
+                @Html.DisplayFor(modelItem => item.Address)  
+            </td>  
+            <td>  
+                @Html.ActionLink("Edit", "Edit", new { id=item.Id  }) |  
+                @Html.ActionLink("Details", "Details", new {  id=item.Id }) |  
+                @Html.ActionLink("Delete", "Delete", new {  id=item.Id  })  
+            </td>  
+        </tr>  
+}  
+    </tbody>  
+</table>  
+
+====================== we will create  Edit View View============
+
+@model StudentRecordManagementSystem.Models.Student  
+@{  
+    ViewData["Title"] = "Edit";  
+}  
+<h2>Edit</h2>  
+  
+<h4>Student</h4>  
+<hr />  
+<div class="row">  
+    <div class="col-md-4">  
+        <form asp-action="Edit">  
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>  
+            <div class="form-group">  
+                <label asp-for="Id" class="control-label"></label>  
+                <input asp-for="Id" class="form-control" readonly/>  
+                <span asp-validation-for="Id" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="FirstName" class="control-label"></label>  
+                <input asp-for="FirstName" class="form-control" />  
+                <span asp-validation-for="FirstName" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="LastName" class="control-label"></label>  
+                <input asp-for="LastName" class="form-control" />  
+                <span asp-validation-for="LastName" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="Email" class="control-label"></label>  
+                <input asp-for="Email" class="form-control" />  
+                <span asp-validation-for="Email" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="Mobile" class="control-label"></label>  
+                <input asp-for="Mobile" class="form-control" />  
+                <span asp-validation-for="Mobile" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <label asp-for="Address" class="control-label"></label>  
+                <input asp-for="Address" class="form-control" />  
+                <span asp-validation-for="Address" class="text-danger"></span>  
+            </div>  
+            <div class="form-group">  
+                <input type="submit" value="Update" class="btn btn-default" />  
+            </div>  
+        </form>  
+    </div>  
+</div>  
+  
+<div>  
+    <a asp-action="Index">Back to List</a>  
+</div>  
+  
+@section Scripts {  
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}  
+}  
+
+
+
+====================== we will create  Delete View============
+
+@model StudentRecordManagementSystem.Models.Student  
+  
+@{  
+    ViewData["Title"] = "Delete";  
+}  
+  
+<h2>Delete</h2>  
+  
+<h3>Are you sure you want to delete this?</h3>  
+<div>  
+    <h4>Student</h4>  
+    <hr />  
+    <dl class="dl-horizontal">  
+        <dt>  
+            @Html.DisplayNameFor(model => model.Id)  
+        </dt>  
+        <dd>  
+            @Html.DisplayFor(model => model.Id)  
+        </dd>  
+        <dt>  
+            @Html.DisplayNameFor(model => model.FirstName)  
+        </dt>  
+        <dd>  
+            @Html.DisplayFor(model => model.FirstName)  
+        </dd>  
+        <dt>  
+            @Html.DisplayNameFor(model => model.LastName)  
+        </dt>  
+        <dd>  
+            @Html.DisplayFor(model => model.LastName)  
+        </dd>  
+        <dt>  
+            @Html.DisplayNameFor(model => model.Email)  
+        </dt>  
+        <dd>  
+            @Html.DisplayFor(model => model.Email)  
+        </dd>  
+        <dt>  
+            @Html.DisplayNameFor(model => model.Mobile)  
+        </dt>  
+        <dd>  
+            @Html.DisplayFor(model => model.Mobile)  
+        </dd>  
+        <dt>  
+            @Html.DisplayNameFor(model => model.Address)  
+        </dt>  
+        <dd>  
+            @Html.DisplayFor(model => model.Address)  
+        </dd>  
+    </dl>  
+      
+    <form asp-action="Delete">  
+        <input type="submit" value="Delete" class="btn btn-default" /> |  
+        <a asp-action="Index">Back to List</a>  
+    </form>  
+</div>  
