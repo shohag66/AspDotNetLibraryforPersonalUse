@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientSideValidatyion", "Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrudUsingSqlQuery", "CrudUsingSqlQuery\CrudUsingSqlQuery.csproj", "{9AB20922-8E9C-496A-8730-90ECAE36030E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrudUsingSp", "CrudUsingSp\CrudUsingSp.csproj", "{58F05A21-921A-40E7-A7AD-B4D1715C7B73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9AB20922-8E9C-496A-8730-90ECAE36030E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AB20922-8E9C-496A-8730-90ECAE36030E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AB20922-8E9C-496A-8730-90ECAE36030E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F05A21-921A-40E7-A7AD-B4D1715C7B73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F05A21-921A-40E7-A7AD-B4D1715C7B73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F05A21-921A-40E7-A7AD-B4D1715C7B73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F05A21-921A-40E7-A7AD-B4D1715C7B73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
