@@ -121,6 +121,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Config\StoreConnection.cs" />
+    <Compile Include="Controllers\CheakRadioButtonController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductController.cs" />
     <Compile Include="Global.asax.cs">
@@ -168,6 +169,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Product\Create.cshtml" />
     <Content Include="Views\Product\GetAll.cshtml" />
+    <Content Include="Views\CheakRadioButton\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
